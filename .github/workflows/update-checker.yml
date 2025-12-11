@@ -13,13 +13,18 @@
 name: Update Checker
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+  # 【修改点1】这里必须改成你要编译的那个源码仓库
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-24.10
+  # 【修改点2】分支也要对应（你之前用的是 2410 分支）
+  REPO_BRANCH: 2410
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: 0 */18 * * *
+  # 【修改点3】去掉下面两行前面的 # 号，开启自动运行
+  schedule:
+    # 这里的含义是：每天运行一次（UTC时间 0点，北京时间早上8点）
+    # 你也可以改成 0 */12 * * * (每12小时查一次)
+    - cron: 0 0 * * *
 
 jobs:
   check:
