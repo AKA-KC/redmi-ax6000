@@ -6,38 +6,52 @@
 #
 
 # =========================================================
-# 1. 基础系统设置
+# 1. 基础系统设置 (修复路径错误)
 # =========================================================
 
 # 修改默认 IP 为 192.168.2.1
 sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
 
-# 设置默认密码为空 (移除默认密码)
-sed -i '/CYXluq4wUazHjmCDBCqXF/d' package/lean/default-settings/files/zzz-default-settings
+# 设置默认密码为空 (修复：使用通用方式修改 shadow 文件，适配 ImmortalWrt)
+# 如果文件不存在则跳过，避免报错中断
+if [ -f package/base-files/files/etc/shadow ]; then
+    sed -i '/root/c\root:$1$0$0:0:99999:7:::' package/base-files/files/etc/shadow
+fi
 
 # =========================================================
-# 2. 编译环境修复 (关键步骤)
+# 2. 编译环境修复
 # =========================================================
 
-# 移除旧版 Golang，拉取最新版
-# (Tailscale 和 DDNS-Go 都是 Go 语言写的，这一步不做会导致编译失败)
+# 移除旧版 Golang，拉取最新版 (Tailscale/DDNS-Go 必须)
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
 
 # =========================================================
-# 3. 添加插件源码 (Nikki & DDNS-Go)
+# 3. 添加插件源码 (修复下载失败问题)
 # =========================================================
 
-# 创建自定义包目录
 mkdir -p package/custom
 
-# 添加 Nikki (Clash Meta 客户端)
-git clone https://github.com/nikkinolife/openwrt-nikki.git package/custom/openwrt-nikki
-git clone https://github.com/nikkinolife/luci-app-nikki.git package/custom/luci-app-nikki
-
-# 添加 DDNS-Go (动态域名)
+# 【DDNS-Go】
 git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/custom/luci-app-ddns-go
 
-# (可选) Tailscale 和 ZeroTier 通常在官方 feeds 里有，
-# 如果编译时找不到，可以取消下面这行的注释来手动拉取 Tailscale：
-# git clone https://github.com/asvow/luci-app-tailscale package/custom/luci-app-tailscale
+# 【Tailscale】
+git clone https://github.com/asvow/luci-app-tailscale package/custom/luci-app-tailscale
+
+# 【Nikki】(关键修复)
+# 原来的独立仓库挂了，我们从 kiddin9 的大仓库里把 Nikki 提取出来
+# 1. 先把 kiddin9 的仓库拉到一个临时文件夹
+git clone --depth 1 https://github.com/kiddin9/openwrt-packages.git package/temp_kiddin9
+
+# 2. 复制 Nikki 相关的包到 custom 目录
+if [ -d "package/temp_kiddin9/nikki" ]; then
+    cp -r package/temp_kiddin9/nikki package/custom/
+    cp -r package/temp_kiddin9/luci-app-nikki package/custom/
+else
+    # 备选方案：如果目录结构变了，尝试从另一个源拉取 Mihomo (Nikki 的核心)
+    echo "Warning: Nikki not found in primary source, trying backup..."
+    git clone https://github.com/morytyann/OpenWrt-mihomo.git package/custom/luci-app-mihomo
+fi
+
+# 3. 删除临时文件夹，清理垃圾
+rm -rf package/temp_kiddin9
