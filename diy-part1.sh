@@ -21,7 +21,6 @@
 # File name: diy-part1.sh
 # description: 添加第三方插件源 (Kenzok8)
 
-# 添加 kenzok8 的 small 仓库 (包含 Nikki, TurboACC, Golang 等全套依赖)
-echo 'src-git small https://github.com/kenzok8/small' >>feeds.conf.default
-# 添加依赖库
-echo 'src-git kenzo https://github.com/kenzok8/openwrt-packages' >>feeds.conf.default
+#!/bin/bash
+# 只添加 Mihomo (Clash Meta) 源，其他用系统自带的，最稳！
+echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo" >> feeds.conf.default
