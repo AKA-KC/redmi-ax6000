@@ -7,10 +7,20 @@ if [ -f package/base-files/files/etc/shadow ]; then
     sed -i '/root/c\root:$1$0$0:0:99999:7:::' package/base-files/files/etc/shadow
 fi
 
-# 2. 重新写入正确的 Nikki 配置
+# 1. 强制开启 Nikki (Mihomo)
+# 先删掉可能存在的错误行
+sed -i '/CONFIG_PACKAGE_luci-app-nikki/d' .config
+sed -i '/CONFIG_PACKAGE_nikki/d' .config
+# 强制写入
 echo "CONFIG_PACKAGE_luci-app-nikki=y" >> .config
 echo "CONFIG_PACKAGE_nikki=y" >> .config
 
-# 3. 顺便加上 DDNS-Go
+# 2. 强制开启 DDNS-Go
+sed -i '/CONFIG_PACKAGE_luci-app-ddns-go/d' .config
+sed -i '/CONFIG_PACKAGE_ddns-go/d' .config
 echo "CONFIG_PACKAGE_luci-app-ddns-go=y" >> .config
 echo "CONFIG_PACKAGE_ddns-go=y" >> .config
+
+# 3. 强制开启组网 (Tailscale)
+echo "CONFIG_PACKAGE_luci-app-tailscale=y" >> .config
+echo "CONFIG_PACKAGE_tailscale=y" >> .config
