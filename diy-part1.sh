@@ -17,10 +17,8 @@
 # 我们已经全部安排在 diy-part2.sh 里处理了。
 # 这个文件留空或者保持默认即可，不需要添加任何代码。
 
-#!/bin/bash
-# File name: diy-part1.sh
-# description: 添加第三方插件源 (Kenzok8)
-
-#!/bin/bash
-# 只添加 Mihomo (Clash Meta) 源，其他用系统自带的，最稳！
+# 添加 Mihomo 源
 echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo" >> feeds.conf.default
+
+# 添加 DDNS-Go 源 (如果官方源里没有，建议加上这个保险)
+echo "src-git ddns_go https://github.com/sirpdboy/luci-app-ddns-go" >> feeds.conf.default
