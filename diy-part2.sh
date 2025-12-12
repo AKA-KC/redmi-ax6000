@@ -7,3 +7,10 @@ if [ -f package/base-files/files/etc/shadow ]; then
     sed -i '/root/c\root:$1$0$0:0:99999:7:::' package/base-files/files/etc/shadow
 fi
 
+# 2. 重新写入正确的 Nikki 配置
+echo "CONFIG_PACKAGE_luci-app-nikki=y" >> .config
+echo "CONFIG_PACKAGE_nikki=y" >> .config
+
+# 3. 顺便加上 DDNS-Go
+echo "CONFIG_PACKAGE_luci-app-ddns-go=y" >> .config
+echo "CONFIG_PACKAGE_ddns-go=y" >> .config
