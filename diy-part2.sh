@@ -11,6 +11,8 @@ fi
 # 先删掉可能存在的错误行
 sed -i '/CONFIG_PACKAGE_luci-app-nikki/d' .config
 sed -i '/CONFIG_PACKAGE_nikki/d' .config
+echo "Deleting broken rd05a1 packages..."
+find package/ -name "*rd05a1*" -exec rm -rf {} +
 # 强制写入
 echo "CONFIG_PACKAGE_luci-app-nikki=y" >> .config
 echo "CONFIG_PACKAGE_nikki=y" >> .config
